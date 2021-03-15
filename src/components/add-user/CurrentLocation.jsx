@@ -4,9 +4,6 @@ import { GoogleMap, LoadScript, Marker } from '@react-google-maps/api';
 import { fetchLocation } from '../../axios/axios';
 
 const CurrentLocation = (props) => {
-  const { country, getLocationInfo } = props;
-  console.log(country);
-
   const mapStyles = {
     height: '100vh',
     width: '100%',
@@ -28,28 +25,22 @@ const CurrentLocation = (props) => {
   });
 
   useEffect(() => {
-    let isMounted = true;
     const fetchedLocation = async () => {
-      if (country) {
-        const location = await fetchLocation(country);
-        if (isMounted)
-          setCurrentPosition({ lat: location[0], lng: location[1] });
+      if (props.country) {
+        const location = await fetchLocation(props.country);
+        setCurrentPosition({ lat: location[0], lng: location[1] });
 
-        getLocationInfo({ lat: location[0], lng: location[1] });
+        props.getLocationInfo({ lat: location[0], lng: location[1] });
       }
     };
-
     fetchedLocation();
-    return () => {
-      isMounted = false;
-    };
-  }, [country, getLocationInfo]);
+  }, [props.country]);
 
   const onMarkerDragEnd = (e) => {
     const lat = e.latLng.lat();
     const lng = e.latLng.lng();
     setCurrentPosition({ lat, lng });
-    getLocationInfo({ lat, lng });
+    props.getLocationInfo({ lat, lng });
   };
 
   return (

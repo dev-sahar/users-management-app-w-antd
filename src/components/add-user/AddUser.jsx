@@ -191,14 +191,20 @@ const AddUser = () => {
       onSuccess('ok');
     }, 0);
   };
-
+  const [formValues, setFormValues] = useState({});
   return (
     <div>
       <div className='row'>
         <h2>{!isEditing ? `Add user` : `Edit user`}</h2>
       </div>
 
-      <Form {...layout} form={form} name='users-form' onFinish={handleClick}>
+      <Form
+        onValuesChange={(values) => setFormValues(values)}
+        {...layout}
+        form={form}
+        name='users-form'
+        onFinish={handleClick}
+      >
         {/* Username */}
         <Form.Item
           name='username'
@@ -296,7 +302,6 @@ const AddUser = () => {
               message: 'Location is required',
             },
           ]}
-          //dependencies={['country']}
         >
           <CurrentLocation
             country={form.getFieldValue('country')}
