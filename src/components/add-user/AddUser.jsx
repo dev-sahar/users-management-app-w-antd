@@ -41,8 +41,8 @@ const AddUser = () => {
 
   const { username, phone, email, country, location, photo, breif } = userInfo;
 
-  const { Option } = Select;
   const [form] = Form.useForm();
+  const { Option } = Select;
 
   const layout = {
     labelCol: {
@@ -53,6 +53,7 @@ const AddUser = () => {
     },
   };
 
+  // useEffect to set the fields with the edit data to update user's info
   useEffect(() => {
     let isMounted = true;
     if (params && user && isMounted) {
@@ -85,8 +86,10 @@ const AddUser = () => {
     };
   }, [form, params, user]);
 
+  // State for countries displayed in the <Select /> of the country
   const [countries, setCountries] = useState([]);
 
+  // useEffct to { fetchCountries } from axios
   useEffect(() => {
     let isMounted = true;
     const fetchedCountries = async () => {
@@ -103,7 +106,8 @@ const AddUser = () => {
     setUserInfo((userInfoObj) => ({ ...userInfoObj, [name]: value }));
   };
 
-  const handleClick = (values) => {
+  // Handles the submission of the form data (dispatch addUser and updateUser actions)
+  const handleFormSubmit = (values) => {
     const { username, phone, email, country, location, photo, breif } = values;
     if (!isEditing) {
       dispatch(
@@ -138,17 +142,21 @@ const AddUser = () => {
     history.push('/');
   };
 
+  // Handles the location (as latitude and longitude) from <CurrentLocation /> component
   const getLocationInfo = (childData) => {
     setUserInfo((userInfoObj) => ({ ...userInfoObj, location: childData }));
     form.setFieldsValue({ location: childData });
   };
 
+  // Convert image into base64 (use the FileReader API (readAsDataURL())
+  // to convert the image to a dataURL) representing the file's data as a base64 encoded string
   const getBase64 = (img, callback) => {
     const reader = new FileReader();
     reader.addEventListener('load', () => callback(reader.result));
     reader.readAsDataURL(img);
   };
 
+  // Image validation for JPG/PNG file type and size of the image before upload
   const beforeUpload = (file) => {
     const isJpgOrPng = file.type === 'image/jpeg' || file.type === 'image/png';
     if (!isJpgOrPng) {
@@ -161,8 +169,11 @@ const AddUser = () => {
     return isJpgOrPng && isLt2M;
   };
 
+  // State for loading of the image upload
   const [loading, setLoading] = useState(false);
 
+  // Display <LoadingOutlined /> when image is loading and
+  // <PlusOutlined /> to upload new image
   const uploadButton = (
     <div>
       {loading ? <LoadingOutlined /> : <PlusOutlined />}
@@ -170,6 +181,7 @@ const AddUser = () => {
     </div>
   );
 
+  // Handles image upload
   const handleUploadChange = (info) => {
     if (info.file.status === 'uploading') {
       setLoading(true);
@@ -186,12 +198,18 @@ const AddUser = () => {
     }
   };
 
+  // Override <Upload /> default upload AJAX implementation with a simulated successful upload, since
+  // <Upload /> renders another component (rc-upload) as its child which handles the actual AJAX upload,
+  // so passing a customRequest prop to <Upload/> (which will be passed to rc-upload component)
+  // will override this behaviour (trigger the "done" status).
   const dummyRequest = ({ file, onSuccess }) => {
     setTimeout(() => {
       onSuccess('ok');
     }, 0);
   };
+
   const [formValues, setFormValues] = useState({});
+
   return (
     <div>
       <div className='row'>
@@ -203,7 +221,7 @@ const AddUser = () => {
         {...layout}
         form={form}
         name='users-form'
-        onFinish={handleClick}
+        onFinish={handleFormSubmit}
       >
         {/* Username */}
         <Form.Item
@@ -280,7 +298,12 @@ const AddUser = () => {
           name='country'
           value={country}
           label='Country'
-          rules={[{ required: true, message: 'Country is required' }]}
+          rules={[
+            {
+              required: true,
+              message: 'Country is required',
+            },
+          ]}
           onChange={handleChange}
         >
           <Select placeholder='Select a country' allowClear>

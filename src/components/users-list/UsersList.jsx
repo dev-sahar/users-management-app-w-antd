@@ -11,18 +11,21 @@ const UsersList = () => {
   const { users } = useSelector((state) => state.users);
 
   const [dataSource, setDataSource] = useState(users);
-  const [value, setValue] = useState('');
 
+  const [searchValue, setsearchValue] = useState('');
+
+  // Handles the search input
   const handleChange = (e) => {
     e.preventDefault();
-    const currValue = e.target.value;
-    setValue(currValue);
+    const { value } = e.target;
+    setsearchValue(value);
     const filteredData = users.filter((user) =>
-      user.username.toLowerCase().includes(currValue.toLowerCase())
+      user.username.toLowerCase().includes(value.toLowerCase())
     );
     setDataSource(filteredData);
   };
 
+  // Handles the delete (dispatch deleteUser action)
   const handleDelete = (record) => {
     const id = record.id;
     if (window.confirm('Are you sure you want to delete user?')) {
@@ -81,7 +84,7 @@ const UsersList = () => {
         <Col flex='70%'>
           <Input
             placeholder='Search Username'
-            value={value}
+            value={searchValue}
             onChange={handleChange}
           />
         </Col>
